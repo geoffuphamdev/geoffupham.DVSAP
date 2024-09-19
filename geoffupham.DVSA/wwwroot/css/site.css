@@ -1,0 +1,32 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+@media (max-width: 400px) {
+    body {
+        padding: 10px;
+    }
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+button {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+#videoPlayer {
+    margin-top: 20px;
+}

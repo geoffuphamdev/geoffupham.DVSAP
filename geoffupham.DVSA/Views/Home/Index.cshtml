@@ -1,0 +1,88 @@
+﻿@model geoffupham.DVSA.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "DVSA - Video Manager";
+}
+
+
+<div class="container mt-4" id="app">
+    <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="catalogue-tab" data-bs-toggle="tab" data-bs-target="#catalogue" type="button" role="tab" aria-controls="catalogue" aria-selected="true">Catalogue</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="upload-tab" data-bs-toggle="tab" data-bs-target="#upload" type="button" role="tab" aria-controls="upload" aria-selected="false">Upload</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="catalogue" role="tabpanel" aria-labelledby="catalogue-tab">
+            <div id="videoPlayer" class="mb-4">
+                <video id="player" controls style="width: 100%; max-width: 800px; height: auto; max-height: 450px; object-fit: contain;"></video>
+            </div>
+            <div id="catalogView">
+                <h2 class="mb-3">Video Catalog</h2>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Filename</th>
+                                <th>File Size</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: videos">
+                            <tr>
+                                <td><a href="#" data-bind="text: name, click: $parent.playVideo" class="text-decoration-none"></a></td>
+                                <td data-bind="text: formatSize(size)"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="upload" role="tabpanel" aria-labelledby="upload-tab">
+            <div id="uploadForm" class="mt-3">
+                <h2 class="mb-3">Upload Video</h2>
+                <p class="lead">Choose MP4 files to be uploaded to the Video Catalogue</p>
+                <form data-bind="submit: uploadVideo">
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+                        <input id="fileInput" type="file" name="file" accept=".mp4" required style="display: none;" multiple />
+                        <span id="selectedFiles" class="ms-2"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Function to load scripts in order
+        function loadScriptsInOrder(scripts, callback) {
+            var index = 0;
+            function loadNext() {
+                if (index < scripts.length) {
+                    var script = document.createElement('script');
+                    script.src = scripts[index];
+                    script.onload = loadNext;
+                    document.body.appendChild(script);
+                    index++;
+                } else {
+                    if (callback) callback();
+                }
+            }
+            loadNext();
+        }
+
+        // Load scripts in order
+        loadScriptsInOrder([
+            'https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js',
+            '/js/site.js'
+        ], function () {
+            // All scripts are loaded, now initialize the app
+            var initialVideos = @Html.Raw(Json.Serialize(Model?.Videos ?? new List<VideoFile>()));
+            ko.applyBindings(new AppViewModel(initialVideos));
+        });
+    </script>
+}
