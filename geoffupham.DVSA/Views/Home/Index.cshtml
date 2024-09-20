@@ -19,7 +19,6 @@
                 <video id="player" controls style="width: 100%; max-width: 800px; height: auto; max-height: 450px; object-fit: contain;"></video>
             </div>
             <div id="catalogView">
-                <h2 class="mb-3">Video Catalog</h2>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="table-light">
@@ -31,7 +30,7 @@
                         <tbody data-bind="foreach: videos">
                             <tr>
                                 <td><a href="#" data-bind="text: name, click: $parent.playVideo" class="text-decoration-none"></a></td>
-                                <td data-bind="text: formatSize(size)"></td>
+                                <td data-bind="text: $parent.formatSize(size)"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -57,32 +56,10 @@
 
 @section Scripts {
     <script>
-        // Function to load scripts in order
-        function loadScriptsInOrder(scripts, callback) {
-            var index = 0;
-            function loadNext() {
-                if (index < scripts.length) {
-                    var script = document.createElement('script');
-                    script.src = scripts[index];
-                    script.onload = loadNext;
-                    document.body.appendChild(script);
-                    index++;
-                } else {
-                    if (callback) callback();
-                }
-            }
-            loadNext();
-        }
-
-        // Load scripts in order
-        loadScriptsInOrder([
-            'https://cdn.jsdelivr.net/npm/knockout@3.5.1/build/output/knockout-latest.js',
-            'https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js',
-            '/js/site.js'
-        ], function () {
-            // All scripts are loaded, now initialize the app
-            var initialVideos = @Html.Raw(Json.Serialize(Model?.Videos ?? new List<VideoFile>()));
-            ko.applyBindings(new AppViewModel(initialVideos));
-        });
+        window.initialVideos = @Html.Raw(Json.Serialize(Model?.Videos ?? new List<VideoFile>()));
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/knockout@3.5.1/build/output/knockout-latest.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/site.js"></script>
+    
 }
