@@ -1,5 +1,4 @@
 ﻿using geoffupham.DVSA.Models;
-using Microsoft.Extensions.Configuration;
 
 namespace geoffupham.DVSA.Services;
 
@@ -12,19 +11,6 @@ public class VideoService : IVideoService
     {
         _mediaFolder = configuration.GetValue<string>("MediaFolder");
         _maxFileSize = configuration.GetValue<long>("MaxFileSize");
-    }
-
-    public IEnumerable<VideoFile> GetAllVideos()
-    {
-        var directory = new DirectoryInfo(_mediaFolder);
-        var files = directory.GetFiles("*.mp4");
-
-        return files.Select(f => new VideoFile
-        {
-            Name = f.Name,
-            Size = f.Length,
-            Path = Path.GetRelativePath(_mediaFolder, f.FullName).Replace('\\', '/')
-        });
     }
 
     public async Task<List<VideoFile>> GetAllVideosAsync()
@@ -47,11 +33,19 @@ public class VideoService : IVideoService
 
         var filePath = Path.Combine(_mediaFolder, file.FileName);
 
-        using (var stream = new FileStream(filePath, FileMode.Create))
+        try
         {
-            await file.CopyToAsync(stream);
+            using (var fileStream = File.Create(filePath))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+            return true;
         }
-
-        return true;
+        catch (IOException ex)
+        {
+            // Log the exception
+            Console.WriteLine($"Error uploading file: {ex.Message}");
+            return false;
+        }
     }
 }
